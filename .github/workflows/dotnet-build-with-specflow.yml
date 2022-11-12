@@ -1,16 +1,9 @@
 name: Dotnet build and test
 on:
   workflow_call:
-    inputs:
-      OUTPUT_SPECFLOW:
-        required: false
-        type: boolean
-        default: false
     secrets:
       REPO_ACCESS_TOKEN:
-        required: false
-        type: string
-        default: ""
+        required: true
 
 jobs:
   build-and-test:
@@ -40,15 +33,15 @@ jobs:
         run: dotnet test --no-restore --verbosity normal
 
       - name: Dotnet install SpecFlow.Plus.LivingDoc.CLI
-        if: ${{ inputs.OUTPUT_SPECFLOW }} && github.ref == 'refs/heads/trunk' && github.event_name == 'push' && always()
+        if: github.ref == 'refs/heads/trunk' && github.event_name == 'push' && always()
         run: dotnet tool install --global SpecFlow.Plus.LivingDoc.CLI
 
       - name: Execute living doc test-assembly
-        if: ${{ inputs.OUTPUT_SPECFLOW }} && github.ref == 'refs/heads/trunk' && github.event_name == 'push' && always()
+        if: github.ref == 'refs/heads/trunk' && github.event_name == 'push' && always()
         run: livingdoc test-assembly ${{ env.SPECFLOW_PATH }}/Funplace.Api.Specs.dll -t ${{ env.SPECFLOW_PATH }}/TestExecution.json
 
       - name: Publish specflow to ${{ env.SPECFLOW_REPO }}
-        if: ${{ inputs.OUTPUT_SPECFLOW }} && github.ref == 'refs/heads/trunk' && github.event_name == 'push' && always()
+        if: github.ref == 'refs/heads/trunk' && github.event_name == 'push' && always()
         run: |
           git clone https://.:${{ secrets.REPO_ACCESS_TOKEN }}@github.com/kennydl/${{ env.SPECFLOW_REPO }}
           cp ./LivingDoc.html ${{ env.SPECFLOW_REPO }}
@@ -56,6 +49,6 @@ jobs:
           mv LivingDoc.html index.html
           git add .
           git config --global user.email "<>"
-          git config --global user.name "workflow-github-bot":wq
+          git config --global user.name "funplace-api-github-bot":wq
           git diff-index --quiet HEAD || git commit -m "Automatic publish of specflow living doc"
           git push

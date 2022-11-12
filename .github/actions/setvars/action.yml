@@ -1,8 +1,8 @@
-name: 'Set environment variables'
-description: 'Configures environment variables for a workflow'
+name: "Set environment variables"
+description: "Configures environment variables for a workflow"
 inputs:
   varFilePath:
-    description: 'File path to variable file or directory.'
+    description: "File path to variable file or directory."
     required: false
     default: ./.github/variables/*
 runs:

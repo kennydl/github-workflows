@@ -1,0 +1,29 @@
+name: Go build and test
+
+on:
+  workflow_call:
+    inputs:
+      WORKING_DIRECTORY:
+        required: false
+        type: string
+        default: '.'
+
+jobs:
+  build-and-test:    
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.WORKING_DIRECTORY }}
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '>=1.19.0'
+
+      - name: Build
+        run: go build -v ./...
+
+      - name: Test
+        run: go test -v ./...
